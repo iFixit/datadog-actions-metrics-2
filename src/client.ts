@@ -6,6 +6,7 @@ type Inputs = {
   datadogApiKey?: string
   datadogSite?: string
   datadogTags: string[]
+  filteredMetrics: string[]
 }
 
 export type MetricsClient = {
@@ -14,11 +15,12 @@ export type MetricsClient = {
 }
 
 class DryRunMetricsClient implements MetricsClient {
-  constructor(private readonly tags: string[]) {}
+  constructor(private readonly tags: string[], private readonly filteredMetrics: string[]) {}
 
   // eslint-disable-next-line @typescript-eslint/require-await
   async submitMetrics(series: v1.Series[], description: string): Promise<void> {
     series = injectTags(series, this.tags)
+    series = filterMetrics(series, this.filteredMetrics)
     core.startGroup(`Metrics payload (dry-run) (${description})`)
     core.info(JSON.stringify(series, undefined, 2))
     core.endGroup()
@@ -27,6 +29,7 @@ class DryRunMetricsClient implements MetricsClient {
   // eslint-disable-next-line @typescript-eslint/require-await
   async submitDistributionPoints(series: v1.DistributionPointsSeries[], description: string): Promise<void> {
     series = injectTags(series, this.tags)
+    series = filterMetrics(series, this.filteredMetrics)
     core.startGroup(`Distribution points payload (dry-run) (${description})`)
     core.info(JSON.stringify(series, undefined, 2))
     core.endGroup()
@@ -37,10 +40,12 @@ class RealMetricsClient implements MetricsClient {
   constructor(
     private readonly metricsApi: v1.MetricsApi,
     private readonly tags: string[],
+    private readonly filteredMetrics: string[]
   ) {}
 
   async submitMetrics(series: v1.Series[], description: string): Promise<void> {
     series = injectTags(series, this.tags)
+    series = filterMetrics(series, this.filteredMetrics)
     core.startGroup(`Metrics payload (${description})`)
     core.info(JSON.stringify(series, undefined, 2))
     core.endGroup()
@@ -51,6 +56,7 @@ class RealMetricsClient implements MetricsClient {
 
   async submitDistributionPoints(series: v1.DistributionPointsSeries[], description: string): Promise<void> {
     series = injectTags(series, this.tags)
+    series = filterMetrics(series, this.filteredMetrics)
     core.startGroup(`Distribution points payload (${description})`)
     core.info(JSON.stringify(series, undefined, 2))
     core.endGroup()
@@ -76,7 +82,7 @@ export const filterMetrics = <S extends { metric: string }>(series: S[], filtere
 
 export const createMetricsClient = (inputs: Inputs): MetricsClient => {
   if (inputs.datadogApiKey === undefined) {
-    return new DryRunMetricsClient(inputs.datadogTags)
+    return new DryRunMetricsClient(inputs.datadogTags, inputs.filteredMetrics)
   }
 
   const configuration = client.createConfiguration({
@@ -90,7 +96,7 @@ export const createMetricsClient = (inputs: Inputs): MetricsClient => {
       site: inputs.datadogSite,
     })
   }
-  return new RealMetricsClient(new v1.MetricsApi(configuration), inputs.datadogTags)
+  return new RealMetricsClient(new v1.MetricsApi(configuration), inputs.datadogTags, inputs.filteredMetrics)
 }
 
 const createHttpLibraryIfHttpsProxy = () => {
