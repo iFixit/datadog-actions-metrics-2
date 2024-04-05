@@ -426,6 +426,7 @@ You can set the following inputs:
 | `prefer-distribution-workflow-run-metrics` | `false`        | If true, send the distribution metrics instead of gauge metrics                 |
 | `prefer-distribution-job-metrics`          | `false`        | If true, send the distribution metrics instead of gauge metrics                 |
 | `prefer-distribution-step-metrics`         | `false`        | If true, send the distribution metrics instead of gauge metrics                 |
+| `filtered-metrics`                         | -              | Metrics to be sent. Defaults to all metrics                                     |
 
 ### Proxy
 
