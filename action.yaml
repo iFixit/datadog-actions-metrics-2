@@ -50,10 +50,6 @@ inputs:
     description: Metrics to collect
     required: false
 
-  filtered-metrics:
-    description: Metrics to collect
-    required: false
-
 runs:
   using: 'node20'
   main: 'dist/index.js'
