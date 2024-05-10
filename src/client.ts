@@ -15,7 +15,10 @@ export type MetricsClient = {
 }
 
 class DryRunMetricsClient implements MetricsClient {
-  constructor(private readonly tags: string[], private readonly filteredMetrics: string[]) {}
+  constructor(
+    private readonly tags: string[],
+    private readonly filteredMetrics: string[],
+  ) {}
 
   // eslint-disable-next-line @typescript-eslint/require-await
   async submitMetrics(series: v1.Series[], description: string): Promise<void> {
@@ -40,7 +43,7 @@ class RealMetricsClient implements MetricsClient {
   constructor(
     private readonly metricsApi: v1.MetricsApi,
     private readonly tags: string[],
-    private readonly filteredMetrics: string[]
+    private readonly filteredMetrics: string[],
   ) {}
 
   async submitMetrics(series: v1.Series[], description: string): Promise<void> {
