@@ -6,7 +6,6 @@ import { WorkflowJobs } from '../types'
 const getCommonMetricsTags = (e: WorkflowRunCompletedEvent): string[] => [
   `repository_owner:${e.workflow_run.repository.owner.login}`,
   `repository_name:${e.workflow_run.repository.name}`,
-  `workflow_id:${e.workflow_run.id}`,
   `workflow_name:${e.workflow_run.name}`,
   `run_attempt:${e.workflow_run.run_attempt}`,
   `event:${e.workflow_run.event}`,
@@ -147,7 +146,6 @@ export const computeJobMetrics = (
     const completedAt = unixTime(job.completed_at)
     const tags = [
       ...getCommonMetricsTags(e),
-      `job_id:${String(job.id)}`,
       `job_name:${job.name}`,
       `conclusion:${job.conclusion}`,
       `status:${job.status}`,
@@ -289,11 +287,9 @@ export const computeStepMetrics = (
       const completedAt = unixTime(step.completed_at)
       const tags = [
         ...getCommonMetricsTags(e),
-        `job_id:${String(job.id)}`,
         `job_name:${job.name}`,
         `runs_on:${joinRunsOn(job.labels)}`,
         `step_name:${step.name}`,
-        `step_number:${step.number}`,
         `conclusion:${step.conclusion}`,
         `status:${step.status}`,
       ]
