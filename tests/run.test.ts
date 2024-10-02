@@ -1,14 +1,14 @@
 import * as github from '@actions/github'
 import { v1 } from '@datadog/datadog-api-client'
-import { run } from '../src/run'
-import { exampleWorkflowRunCompletedEvent } from './fixtures'
-import { exampleRateLimitResponse } from './rateLimit/fixtures'
-import { exampleCompletedCheckSuite } from './workflowRun/fixtures/completedCheckSuite'
-import { examplePullRequestClosedEvent } from './fixtures'
-import { WebhookPayload } from '@actions/github/lib/interfaces'
-import { examplePullRequestOpenedEvent } from './fixtures'
-import { exampleGetPullRequestQuery } from './pullRequest/fixtures/getPullRequest'
-import { exampleWorkflowJobs } from './workflowRun/fixtures/workflowJobs'
+import { run } from '../src/run.js'
+import { exampleWorkflowRunCompletedEvent } from './fixtures.js'
+import { exampleRateLimitResponse } from './rateLimit/fixtures/index.js'
+import { exampleCompletedCheckSuite } from './workflowRun/fixtures/completedCheckSuite.js'
+import { examplePullRequestClosedEvent } from './fixtures.js'
+import { WebhookPayload } from '@actions/github/lib/interfaces.js'
+import { examplePullRequestOpenedEvent } from './fixtures.js'
+import { exampleGetPullRequestQuery } from './pullRequest/fixtures/getPullRequest.js'
+import { exampleWorkflowJobs } from './workflowRun/fixtures/workflowJobs.js'
 
 jest.mock('@actions/core')
 
@@ -47,6 +47,7 @@ test('workflow_run with collectJobMetrics', async () => {
       githubTokenForRateLimitMetrics: 'GITHUB_TOKEN',
       datadogApiKey: 'DATADOG_API_KEY',
       datadogTags: [],
+      metricsPatterns: [],
       collectJobMetrics: true,
       collectStepMetrics: true,
       preferDistributionWorkflowRunMetrics: false,
@@ -76,6 +77,7 @@ test('workflow_run', async () => {
       githubTokenForRateLimitMetrics: 'GITHUB_TOKEN',
       datadogApiKey: 'DATADOG_API_KEY',
       datadogTags: [],
+      metricsPatterns: [],
       collectJobMetrics: false,
       collectStepMetrics: false,
       preferDistributionWorkflowRunMetrics: false,
@@ -105,6 +107,7 @@ test('pull_request_opened', async () => {
       githubTokenForRateLimitMetrics: 'GITHUB_TOKEN',
       datadogApiKey: 'DATADOG_API_KEY',
       datadogTags: [],
+      metricsPatterns: [],
       collectJobMetrics: false,
       collectStepMetrics: false,
       preferDistributionWorkflowRunMetrics: false,
@@ -135,6 +138,7 @@ test('pull_request_closed', async () => {
       githubTokenForRateLimitMetrics: 'GITHUB_TOKEN',
       datadogApiKey: 'DATADOG_API_KEY',
       datadogTags: [],
+      metricsPatterns: [],
       collectJobMetrics: false,
       collectStepMetrics: false,
       preferDistributionWorkflowRunMetrics: false,
