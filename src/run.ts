@@ -1,13 +1,13 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { PullRequestEvent, PushEvent, WorkflowRunEvent } from '@octokit/webhooks-types'
-import { computeRateLimitMetrics } from './rateLimit/metrics'
-import { GitHubContext } from './types'
-import { MetricsClient, createMetricsClient } from './client'
-import { handleWorkflowRun } from './workflowRun/handler'
-import { handlePullRequest } from './pullRequest/handler'
-import { handlePush } from './push/handler'
-import { handleSchedule } from './schedule/handler'
+import { computeRateLimitMetrics } from './rateLimit/metrics.js'
+import { GitHubContext } from './types.js'
+import { MetricsClient, createMetricsClient } from './client.js'
+import { handleWorkflowRun } from './workflowRun/handler.js'
+import { handlePullRequest } from './pullRequest/handler.js'
+import { handlePush } from './push/handler.js'
+import { handleSchedule } from './schedule/handler.js'
 
 type Inputs = {
   githubToken: string
@@ -15,6 +15,7 @@ type Inputs = {
   datadogApiKey?: string
   datadogSite?: string
   datadogTags: string[]
+  metricsPatterns: string[]
   collectJobMetrics: boolean
   collectStepMetrics: boolean
   preferDistributionWorkflowRunMetrics: boolean
@@ -29,8 +30,12 @@ export const run = async (context: GitHubContext, inputs: Inputs): Promise<void>
 
   await handleEvent(metricsClient, context, inputs)
 
-  const rateLimit = await getRateLimitMetrics(context, inputs)
-  await metricsClient.submitMetrics(rateLimit, 'rate limit')
+  const rateLimit = await getRateLimitMetrics(context, inputs).catch((e) => {
+    core.warning(`Rate-limit metrics are not available: ${e}`)
+  })
+  if (rateLimit) {
+    await metricsClient.submitMetrics(rateLimit, 'rate-limit')
+  }
 }
 
 const handleEvent = async (metricsClient: MetricsClient, context: GitHubContext, inputs: Inputs) => {
